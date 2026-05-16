@@ -1,12 +1,20 @@
 package cron
 
+// Spec type represent the cron job spec.
 type Spec string
 
 const (
+	// Monthly runs the job once a month.
 	Monthly Spec = "@monthly"
-	Weekly  Spec = "@weekly"
-	Daily   Spec = "@daily"
-	Hourly  Spec = "@hourly"
+
+	// Weekly runs the job once a week.
+	Weekly Spec = "@weekly"
+
+	// Daily runs the job once a day.
+	Daily Spec = "@daily"
+
+	// Hourly runs the job once an hour.
+	Hourly Spec = "@hourly"
 )
 
 func (s Spec) toCron() string {
@@ -23,4 +31,3 @@ func (s Spec) toCron() string {
 		return string(s)
 	}
 }
-

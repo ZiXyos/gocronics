@@ -1,3 +1,4 @@
+// package cron represent the cron job service handler package.
 package cron
 
 import (
@@ -7,6 +8,7 @@ import (
 	rcron "github.com/robfig/cron"
 )
 
+// Handler type represent the cron job structure.
 type Handler struct {
 	logger *slog.Logger
 	cron   *rcron.Cron
@@ -14,20 +16,24 @@ type Handler struct {
 	jobs []*Job
 }
 
+// HandlerOption type represent the function type for cron handler service.
 type HandlerOption func(*Handler)
 
+// WithLogger add a logger to the service handler.
 func WithLogger(logger *slog.Logger) HandlerOption {
 	return func(c *Handler) {
 		c.logger = logger
 	}
 }
 
+// WithCronFunction push the defined jobs in the handler.
 func WithCronFunction(jobs ...*Job) HandlerOption {
 	return func(c *Handler) {
 		c.jobs = jobs
 	}
 }
 
+// NewCronHandler create a new cron job service handler.
 func NewCronHandler(options ...HandlerOption) *Handler {
 	cron := rcron.New()
 
@@ -42,6 +48,7 @@ func NewCronHandler(options ...HandlerOption) *Handler {
 	return handler
 }
 
+// Run register and execute the jobs.
 func (ch *Handler) Run(ctx context.Context) error {
 	for _, job := range ch.jobs {
 		if err := ch.cron.AddFunc(job.Spec.toCron(), func() { job.Fn(ctx) }); err != nil {
@@ -57,6 +64,8 @@ func (ch *Handler) Run(ctx context.Context) error {
 	return nil
 }
 
+// Stop gracefully shutdown jobs.
+// TODO: implement gracefull shutdown.
 func (ch *Handler) Stop(ctx context.Context) error {
 	<-ctx.Done()
 	ch.cron.Stop()
@@ -64,6 +73,7 @@ func (ch *Handler) Stop(ctx context.Context) error {
 	return nil
 }
 
+// Name return the service name.
 func (ch *Handler) Name() string {
 	return "cron-job-handler"
 }
